@@ -1,32 +1,36 @@
-import fs from "fs";
-import { IVessel } from "../interfaces/vessel.interface.js";
-import { IPort } from "../interfaces/port.interface.js";
-import fetch, { Headers } from "node-fetch";
+import axios from "axios";
 import { env } from "process";
+import { IPort } from "../interfaces/port.interface.js";
+import { IVessel } from "../interfaces/vessel.interface.js";
 
-// const DATA_PATH = "https://developer.searoutes.com/reference/getsearoute";
-// const BASE_PATH = "https://api.searoutes.com/route/v2/sea/";
-const BASE_PATH = "https://api.searoutes.com/geocoding/v2/port/hamburg";
+const BASE_PATH = "https://api.searoutes.com/route/v2/sea";
 const API_KEY = env.CLEARVOYAGE_API_KEY as string;
 
-const headers = new Headers({
+const headers = {
   "Content-Type": "application/json",
-  "x-api-key:": "API_KEY",
-});
+  "x-api-key": API_KEY,
+};
 class SeaRoutesService {
   constructor() {}
 
-  public async find() {
-    try {
-      const res = await fetch(BASE_PATH, { headers: headers });
+  public async find(vessel: IVessel, port: IPort) {
+    const vesselCoordinates = `${vessel?.longitude},${vessel?.latitude}`;
+    const portCoordinates = `${port?.longitude},${port?.latitude}`;
+    const coordinates = `${vesselCoordinates};${portCoordinates}`;
 
-      if (res.ok) {
-        const data = await res.json();
-        console.log("Res good");
-        console.log(data);
+    console.log(coordinates);
+
+    try {
+      const res = await axios(`${BASE_PATH}/${coordinates}`, {
+        headers: headers,
+      });
+
+      if (res.status === 200) {
+        const data = await res.data;
 
         return data;
       } else {
+        // Could optimize here with granular error handling in case want to throw specific error codes
         console.log(res);
       }
     } catch (err) {
