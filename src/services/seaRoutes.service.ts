@@ -18,8 +18,6 @@ class SeaRoutesService {
     const portCoordinates = `${port?.longitude},${port?.latitude}`;
     const coordinates = `${vesselCoordinates};${portCoordinates}`;
 
-    console.log(coordinates);
-
     try {
       const res = await axios(`${BASE_PATH}/${coordinates}`, {
         headers: headers,

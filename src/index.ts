@@ -38,6 +38,14 @@ app.get("/vessels", async (req, res, next) => {
 app.post("/sea-route", async (req, res, next) => {
   const data = req.body;
 
+  if (!data.vessel || !data.port) {
+    return res.json({
+      succes: false,
+      message: "GET Sea Route Failed",
+      error: "Missing coordinates",
+    });
+  }
+
   const ports = await seaRoutesService.find(data.vessel, data.port);
 
   return res.json({
